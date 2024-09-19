@@ -1,24 +1,23 @@
 import cosas.*
 
 object camion {
-	const property cosas = #{}
+
+	const property cosas = [] //ladrillos pesan 0 y bateria pesa=300
 	const tara = 1000
 	const pesoMax = 2500
 		
 	method cargar(unaCosa) {
 		cosas.add(unaCosa)
+		unaCosa.cambio()
 	}
-
 	method descargar(unaCosa){
 		cosas.remove(unaCosa)
 	}
-
 	method todoPesoPar(){
 		return cosas.all({cosa => cosa.peso().even()})
 	}
 	method hayAlgunoQuePesa(peso){
 		return cosas.any({cosa => cosa.peso() == peso})
-
 	}
 	method elDeNivel(nivel) {
 		return cosas.find({cosa => cosa.nivelPeligrosidad() == nivel})
@@ -41,6 +40,36 @@ object camion {
 	}
 	method noExistenCosasQueSuperenElMaxDePeligrosidad(nivel){
 		return self.objetosQueSuperanPeligrosidad(nivel).isEmpty()
+	}
+
+//AGREGAR AL CAMION
+
+	method tieneAlgoQuePesaEntre(min, max) {
+		return cosas.any({cosa => cosa.peso()>=min and cosa.peso()<=max})
+	}
+
+	method cosaMasPesada(){
+		return cosas.maxIfEmpty({cosa => cosa.peso()}, {})
+	}
+
+	method pesos(){
+		return cosas.map({cosa => cosa.peso()})
+	}
+	method totalBultos() {
+		return cosas.sum({cosa => cosa.bulto()})
+		}
+
+	method llegadaAAlmacen() {
+		cosas.map({cosa => almacen.agregar(cosa)})
+		cosas.clear()
+	}
+}
+
+object almacen {
+	const almacenaje = []
+
+	method agregar(cosa) {
+		almacenaje.add(cosa)
 	}
 }
 

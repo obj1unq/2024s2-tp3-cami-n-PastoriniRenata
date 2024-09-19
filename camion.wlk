@@ -63,10 +63,27 @@ object camion {
 		cosas.map({cosa => almacen.agregar(cosa)})
 		cosas.clear()
 	}
+
+	method trasportar(destino, camino){
+				
+	}
+
+}
+object ruta9{
+	var property pesoMaximoSoportado = 100
+	method nivelPeligrosidad()  {return 11}
+
+	method puedeCircularEnRuta(nivelMaximoPeligrosidad){
+		return 
+	}
 }
 
+object caminoVecinal {
+  
+}
 object almacen {
 	const almacenaje = []
+	var property bultosMax = 3
 
 	method agregar(cosa) {
 		almacenaje.add(cosa)

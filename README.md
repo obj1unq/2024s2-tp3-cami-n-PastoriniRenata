@@ -61,7 +61,6 @@ Por ejemplo, si el camión tiene a knigth Rider y a Bumblebee, mientras que  el 
 llega éste queda vacío y en el almacén quedan bumblebee, arena a grandel y Knigth Rider.
 
 
-//TEST
 El viaje puede ser por la ruta 9 o por caminos vecinales. Esta elección se hace al momento de realizar el transporte.
 
 Para que el transporte pueda ser realizado debe cumplirse con las siguientes condiciones:
@@ -72,6 +71,7 @@ del almacén se configura en 3, y el camión contiene a Bumblebee y Knight Rider
 	* El nivel de peligrosidad de la ruta 9 es 11, solo se puede usar la ruta 9 en los casos en "puedaCircularEnRuta" del punto 1
 	* Los caminos vecinales tienen un peso máximo soportado que es configurable. El peso total del camión no puede ser superior al peso tolerado
 
+puedeCircularEnRuta(nivelMaximoPeligrosidad) Puede circular si no está excedido de peso, y además, ninguno de los objetos cargados supera el nivel máximo de peligrosidad indicado. 
 
 Se pide que el camión entienda el mensaje `transportar(destino, camino)` Donde destino es el almacén (pero se parametriza porque podría
 aparecer otros lugares) y el camino es una de las dos opciones (ruta 9 o caminos vecinales, pero también se debe pensar que pueda haber otros caminos

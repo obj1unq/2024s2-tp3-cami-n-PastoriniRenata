@@ -2,7 +2,7 @@ object knightRider {
 	method peso() { return 500 }
 	method nivelPeligrosidad() { return 10 }
 	method bulto(){ return 1}
-	method cambio(){	}
+	method cambio(){}
 }
 
 object bumblebee {
@@ -51,7 +51,7 @@ object arenaAGranel {
 
 	method nivelPeligrosidad() { return 1 }
 	method bulto(){ return 1}
-	method cambio(){peso += 20	}
+	method cambio(){peso += 20}
 
 
 }
@@ -86,7 +86,6 @@ object contenedor {
 	method peso() { return 100 + self.pesoTotalCosas() }
 	method nivelPeligrosidad() { return self.mayorNivelDePeligrosidad()}
 
-
 	method pesoTotalCosas(){
 		return cosas.sum({cosa => cosa.peso()})
 	}
@@ -102,6 +101,9 @@ object contenedor {
 	method bultosDelContenedor(){
 		return cosas.sum({cosa => cosa.bulto()})
 
+	}
+	method cambio(){
+		cosas.forEach({cosa => cosa.cambio()})
 	}
 
 }

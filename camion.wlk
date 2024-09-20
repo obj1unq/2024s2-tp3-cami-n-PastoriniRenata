@@ -65,7 +65,18 @@ object camion {
 	}
 
 	method trasportar(destino, camino){
-				
+		self.verificaTransportar(destino,camino)
+	}
+	method verificaTransportar(destino,camino){
+		if(not self.puedeTransportar(destino,camino)){
+				self.error("No puede transportar a destino")
+		}
+	}
+	method puedeTransportar(destino,camino){
+		return destino.puedeCircular(self.pesoTotal()) and not self.excedidoDePeso()/*no se si es peso max del camion o del camino*/ and self.alcanzanLosCuposEn(destino)
+	}
+	method alcanzanLosCuposEn(destino){
+		return destino.espacioDisponibleBultos() > self.totalBultos()
 	}
 
 }
@@ -74,7 +85,7 @@ object ruta9{
 	method nivelPeligrosidad()  {return 11}
 
 	method puedeCircularEnRuta(nivelMaximoPeligrosidad){
-		return 
+		return
 	}
 }
 
@@ -87,6 +98,9 @@ object almacen {
 
 	method agregar(cosa) {
 		almacenaje.add(cosa)
+	}
+	method espacioDisponibleBultos(){
+		return bultosMax - almacenaje.size()
 	}
 }
 

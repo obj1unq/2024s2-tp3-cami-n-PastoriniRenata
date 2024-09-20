@@ -42,8 +42,6 @@ object paqueteDeLadrillos {
 	}
 	method cambio(){cantLadrillos += 12}
 
-
-
 }
 
 object arenaAGranel {

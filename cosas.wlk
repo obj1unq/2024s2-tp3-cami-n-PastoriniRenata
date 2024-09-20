@@ -50,8 +50,6 @@ object arenaAGranel {
 	method nivelPeligrosidad() { return 1 }
 	method bulto(){ return 1}
 	method cambio(){peso += 20}
-
-
 }
 
 object bateriaAntiaerea {
@@ -79,11 +77,14 @@ object noTieneMisil{
 
 
 object contenedor {
-	const cosas = [paqueteDeLadrillos,bateriaAntiaerea]
+	const cosas = #{}
 
 	method peso() { return 100 + self.pesoTotalCosas() }
 	method nivelPeligrosidad() { return self.mayorNivelDePeligrosidad()}
-
+	
+	method cargar(unaCosa) {
+			cosas.add(unaCosa)
+		}
 	method pesoTotalCosas(){
 		return cosas.sum({cosa => cosa.peso()})
 	}
@@ -91,7 +92,7 @@ object contenedor {
 		return  self.nivelesDePeligrosidad().maxIfEmpty({0})
 	}
 	method nivelesDePeligrosidad() {
-		return cosas.map({cosa => cosa.nivelPeligrosidad()})
+		return cosas.map({cosa => cosa.nivelPeligrosidad()}) //MAP DEVULVE UNA LISTA
 	  
 	}
 	method bulto(){ return 1 + self.bultosDelContenedor()}

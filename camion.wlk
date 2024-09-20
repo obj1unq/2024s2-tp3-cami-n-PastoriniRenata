@@ -2,7 +2,7 @@ import cosas.*
 
 object camion {
 
-	const property cosas = [] //ladrillos pesan 0 y bateria pesa=300
+	const property cosas = #{} 
 	const tara = 1000
 	const pesoMax = 2500
 		
@@ -20,15 +20,24 @@ object camion {
 		return cosas.any({cosa => cosa.peso() == peso})
 	}
 	method elDeNivel(nivel) {
+		self.hayAlgunoDeNivel(nivel)
 		return cosas.find({cosa => cosa.nivelPeligrosidad() == nivel})
 	}
+	method hayAlgunoDeNivel(nivel){ //no se si está bien salvar el error
+		if (not self.hayAlgunoConNivel(nivel)){
+			self.error("No hay elemento con ese nivel de peligrosidad")
+		}
+	}
+	method hayAlgunoConNivel(nivel){
+		return cosas.any({cosa => cosa.nivelPeligrosidad() == nivel})
+	}
+
 	method pesoTotal() {
 		return tara + cosas.sum({cosa => cosa.peso()})
 	}
 	method excedidoDePeso(){
 		return self.pesoTotal() > pesoMax 
 	}
-
 	method objetosQueSuperanPeligrosidad(nivel){
 		return cosas.filter({cosa => cosa.nivelPeligrosidad() > nivel})
 	}
@@ -53,54 +62,76 @@ object camion {
 	}
 
 	method pesos(){
-		return cosas.map({cosa => cosa.peso()})
+		return cosas.map({cosa => cosa.peso()}) // MAP DEVUELVE UNA LISTA
 	}
 	method totalBultos() {
 		return cosas.sum({cosa => cosa.bulto()})
 		}
 
-	method llegadaAAlmacen() {
-		cosas.map({cosa => almacen.agregar(cosa)})
-		cosas.clear()
+	method llegadaADestino(destino) {
+		cosas.forEach({cosa => destino.cargar(cosa)})
+		self.vaciarCamion()
 	}
+	method vaciarCamion(){
+			cosas.clear()
+		}
 
-	method trasportar(destino, camino){
-		self.verificaTransportar(destino,camino)
+	method transportar(destino, camino){
+		self.validarTransportar(destino, camino)
+		self.llegadaADestino(destino)
 	}
-	method verificaTransportar(destino,camino){
-		if(not self.puedeTransportar(destino,camino)){
-				self.error("No puede transportar a destino")
+	
+	method validarTransportar(destino, camino){
+		self.verificaPeso()
+		self.verificaHayEspacioEnAlmacen(destino)
+		self.verificarCamino(camino)
+	}
+	method verificaPeso(){
+		if(self.excedidoDePeso()){
+			self.error("No puede transportar a destino porque está excedido de peso")
 		}
 	}
-	method puedeTransportar(destino,camino){
-		return destino.puedeCircular(self.pesoTotal()) and not self.excedidoDePeso()/*no se si es peso max del camion o del camino*/ and self.alcanzanLosCuposEn(destino)
+	method verificaHayEspacioEnAlmacen(destino){
+		if(destino.espacioDisponibleBultos() < self.totalBultos()){
+			self.error("No puede transportar a destino porque no hay espacio en " + destino)
+		}
 	}
-	method alcanzanLosCuposEn(destino){
-		return destino.espacioDisponibleBultos() > self.totalBultos()
+	method verificarCamino(camino){
+		if(camino.puedeCircular(self)){
+			self.error("El camino no es apto para el transporte")
+		}
 	}
-
 }
 object ruta9{
 	var property pesoMaximoSoportado = 100
 	method nivelPeligrosidad()  {return 11}
 
-	method puedeCircularEnRuta(nivelMaximoPeligrosidad){
-		return
+	method puedeCircular(transporte){
+		return transporte.puedeCircularEnRuta(self.nivelPeligrosidad())
 	}
 }
 
 object caminoVecinal {
-  
+	var property pesoSoportado = 5000
+
+	method puedeCircular(transporte) {
+	  	return pesoSoportado<= transporte.pesoTotal()
+	}
 }
+
 object almacen {
-	const almacenaje = []
+	const property almacenaje = #{}
 	var property bultosMax = 3
 
-	method agregar(cosa) {
+	method cargar(cosa) {
 		almacenaje.add(cosa)
 	}
 	method espacioDisponibleBultos(){
-		return bultosMax - almacenaje.size()
+		return bultosMax - self.totalBultos()
+	}
+	method totalBultos() {
+		return almacenaje.sum({cosa => cosa.bulto()})
+	  
 	}
 }
 

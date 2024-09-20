@@ -2,9 +2,228 @@ import camion.*
 import cosas.*
 
 describe "Test trasporte" {
-  test "description" {
+  test "No Puede transportar porque no tengo espacio en almacen y aparte por condiciones por ruta 9" {
+    camion.cargar(bumblebee) //es robot --> nivelPeligrosidad = 30, peso = 800
+    camion.cargar(knightRider) // --> nivelPeligrosidad = 10, peso = 500
+    assert.equals(3, camion.totalBultos()) // 2 d bumblebee + 1 d knightRider
+
+    assert.equals(2300, camion.pesoTotal())//peso total camion = 2300
+    assert.notThat(camion.puedeCircularEnRuta(11))
+    almacen.cargar(arenaAGranel) //-> nivelPeligrosidad = 1, peso = 0, totalBultos = 1
+    //assert.equals(1, almacen.totalBultos())
+
+  //  camion.transportar(almacen, ruta9 ) //--> FALSO x espacio en almasen y la peligrosidad de bumblebee
+    assert.throwsExceptionWithMessage("No puede transportar a destino porque no hay espacio en almacen",{camion.transportar(almacen, ruta9 )})
+
+    assert.equals(#{arenaAGranel}, almacen.almacenaje())
+    assert.equals(#{bumblebee,knightRider}, camion.cosas())
+
+  }
+    test "Puede transportar por Camino Vecinal y tengo espacio en almacen" {
+    camion.cargar(bumblebee) //es robot --> nivelPeligrosidad = 30, peso = 800
+    camion.cargar(knightRider) // --> nivelPeligrosidad = 10, peso = 500
+    assert.equals(3, camion.totalBultos()) // 2 d bumblebee + 1 d knightRider
+
+    assert.equals(2300, camion.pesoTotal())//peso total camion = 2300
+    assert.notThat(camion.puedeCircularEnRuta(11))
+
+    almacen.bultosMax(100)
+    almacen.cargar(arenaAGranel) //-> nivelPeligrosidad = 1, peso = 0, totalBultos = 1
+    assert.equals(1, almacen.totalBultos())
+
+    camion.transportar(almacen, caminoVecinal ) //--> TRUE xq caminoVecinal soporta 5000 segun lo q le puse
+
+    assert.equals(#{arenaAGranel,bumblebee,knightRider}, almacen.almacenaje())
+    assert.equals(#{}, camion.cosas())
+
+  }
+
+}
+
+describe "Prueba de cosas" {
+  test "bumblebee robot" {
+    //la agrego al camion y veo si cambia peso y otros
+    camion.cargar(bumblebee) //es robot --> nivelPeligrosidad = 30, peso = 800
+    assert.equals(robot, bumblebee.estado())
+    assert.equals(30, bumblebee.nivelPeligrosidad())
+    assert.equals(800, bumblebee.peso())
+  }
+
+  test "bumblebee auto" {
+    //la agrego al camion y veo si cambia peso y otros
+
+    bumblebee.estado(auto) //es auto --> nivelPeligrosidad = 15, peso = 800
+    assert.equals(auto, bumblebee.estado())
+    assert.equals(15, bumblebee.nivelPeligrosidad())
+    assert.equals(800, bumblebee.peso())
+  }
+  test "paqueteDeLadrillos" {
+    assert.equals(0, paqueteDeLadrillos.cantLadrillos())
+    camion.cargar(paqueteDeLadrillos) // se suman 12 ladrillos 
+    assert.equals(12, paqueteDeLadrillos.cantLadrillos())
+    camion.cargar(paqueteDeLadrillos) // se suman 12 ladrillos
+    assert.equals(24, paqueteDeLadrillos.cantLadrillos())
+
+    assert.equals(1, paqueteDeLadrillos.bulto())
+    
+    paqueteDeLadrillos.cantLadrillos(500)
+    assert.equals(3, paqueteDeLadrillos.bulto())
+
+  }
+  test "arenaAGranel" {
+    //la agrego al camion y veo si cambia peso
+    camion.cargar(arenaAGranel)
+    assert.equals(20, arenaAGranel.peso())
+    camion.cargar(arenaAGranel)
+    assert.equals(40, arenaAGranel.peso())
+
+    assert.equals(1, arenaAGranel.bulto())
+    assert.equals(1, arenaAGranel.nivelPeligrosidad())
+
+
+  }
+  test "bateriaAntiaerea CON Misil" {
+    camion.cargar(bateriaAntiaerea)
+
+    assert.equals(tieneMisil, bateriaAntiaerea.estado())
+    assert.equals(300, bateriaAntiaerea.peso())
+    assert.equals(100, bateriaAntiaerea.nivelPeligrosidad())
+    assert.equals(2, bateriaAntiaerea.bulto()) 
+  }
+    test "bateriaAntiaerea SIN Misil" {
+    bateriaAntiaerea.estado(noTieneMisil)
+
+    assert.equals(200, bateriaAntiaerea.peso())
+    assert.equals(0, bateriaAntiaerea.nivelPeligrosidad())
+    assert.equals(1, bateriaAntiaerea.bulto())
     
   }
+  test "contenedor" {
+    //agregar al contenedor paqueteDeLadrillos y bateriaAntiaerea
+
+    contenedor.cargar(paqueteDeLadrillos)
+    contenedor.cargar(bateriaAntiaerea)
+
+    assert.equals(400, contenedor.peso()) // 100+ 0 de ladrillos + 300 d bat xq tiene misil
+    assert.equals(100, contenedor.nivelPeligrosidad()) //2 ladrillos y 100 x bat devuelve el mas grande
+
+    assert.equals(4, contenedor.bulto()) // 1 x el contenedor + 1 x ladrillos + 2 x bat co nmisil
+  }
+  test "residuosRadioactivos" {
+    assert.equals(0, residuosRadioactivos.peso())
+    assert.equals(200, residuosRadioactivos.nivelPeligrosidad())
+    assert.equals(1, residuosRadioactivos.bulto())
+
+    camion.cargar(residuosRadioactivos)
+    assert.equals(15, residuosRadioactivos.peso())
+    assert.equals(200, residuosRadioactivos.nivelPeligrosidad())
+    assert.equals(1, residuosRadioactivos.bulto())
+  
+  }
+  test "embalajeDeSeguridad" {
+    embalajeDeSeguridad.cosa(bumblebee) //es auto --> nivelPeligrosidad = 15, peso = 800
+    assert.equals(800, embalajeDeSeguridad.peso())
+    assert.equals(7.5, embalajeDeSeguridad.nivelPeligrosidad())
+    assert.equals(2, embalajeDeSeguridad.bulto())    
+  }
+
+}
+
+describe "Prueba Camion" {
+  test "descargar" {
+    camion.cargar(bumblebee)
+    camion.cargar(bateriaAntiaerea)
+    
+    assert.that(camion.cosas().contains(bateriaAntiaerea))
+    assert.that(camion.cosas().contains(bumblebee))
+
+    camion.descargar(bateriaAntiaerea)
+
+    assert.that(camion.cosas().contains(bumblebee))
+    assert.notThat(camion.cosas().contains(bateriaAntiaerea))
+
+  }
+
+  test "todoPesoPar" {
+    camion.cargar(bumblebee)
+    camion.cargar(bateriaAntiaerea)
+    
+    assert.that(camion.todoPesoPar())
+  }
+    test "hayAlgunoQuePesa" {
+    camion.cargar(bumblebee)
+    camion.cargar(bateriaAntiaerea)
+    
+    assert.that(camion.hayAlgunoQuePesa(800)) // 800 bumble y 300 bateria
+    assert.notThat(camion.hayAlgunoQuePesa(200)) // 800 bumble y 300 bateria
+  }
+
+  test "elDeNivel" {
+    camion.cargar(bumblebee) //es robot
+    camion.cargar(bateriaAntiaerea)
+    
+    assert.equals(bumblebee, camion.elDeNivel(30)) // 30 bumble y 100 bateria
+    assert.equals(bateriaAntiaerea, camion.elDeNivel(100)) // 30 bumble y 100 bateria
+ 
+    assert.throwsExceptionWithMessage("No hay elemento con ese nivel de peligrosidad", {camion.elDeNivel(50)})
+  }
+  test "excedidoDePeso" { //pruebo pesoTotal por el metodo excedidoDePeso
+    camion.cargar(bumblebee) //es robot -> pesa 800
+    camion.cargar(bateriaAntiaerea) // peso -> 300
+    
+    assert.notThat(camion.excedidoDePeso()) // 800 + 300 = 1100
+  }
+
+  test "objetosMasPeligrososQue" { //pruebo objetosQueSuperanPeligrosidad xq la uso dentro del metodo objetosMasPeligrososQue
+    camion.cargar(bumblebee) //es robot -> pelig 30
+    camion.cargar(bateriaAntiaerea) // pelig -> 100
+    
+    assert.equals(#{bumblebee,bateriaAntiaerea}, camion.objetosMasPeligrososQue(arenaAGranel)) // arena --> pelig 1
+  }
+
+  test "puedeCircularEnRuta" { //pruebo noExistenCosasQueSuperenElMaxDePeligrosidad xq la uso dentro del metodo objetosMasPeligrososQue
+    camion.cargar(bumblebee) //es robot -> pelig 30
+    camion.cargar(bateriaAntiaerea) // pelig -> 100
+    
+    assert.that( camion.puedeCircularEnRuta(120)) // 
+
+    assert.notThat(camion.puedeCircularEnRuta(50)) // 
+
+  }
+  test "tieneAlgoQuePesaEntre" { 
+    camion.cargar(bumblebee) //es robot -> pesa 800
+    camion.cargar(bateriaAntiaerea) // peso -> 300
+    
+    assert.that( camion.tieneAlgoQuePesaEntre(200,500)) // 
+
+    assert.notThat(camion.tieneAlgoQuePesaEntre(200, 220)) // 
+
+  }
+  test "cosaMasPesada" { 
+
+    assert.equals( , camion.cosaMasPesada()) //está bien q no haya nada como value x como la programé
+
+
+    camion.cargar(bumblebee) //es robot -> pesa 800
+    camion.cargar(bateriaAntiaerea) // peso -> 300
+    
+    assert.equals( bumblebee, camion.cosaMasPesada())  
+
+  }
+
+  test "pesos" { 
+
+    assert.equals([] , camion.pesos())
+
+    camion.cargar(bumblebee) //es robot -> pesa 800
+    camion.cargar(bateriaAntiaerea) // peso -> 300
+    
+    assert.equals([800, 300], camion.pesos()) 
+ 
+  }
+
+//el resto de metodos son probados cuando hice los test de transportar
+
 }
 
 

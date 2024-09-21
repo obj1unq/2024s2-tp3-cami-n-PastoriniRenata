@@ -97,7 +97,7 @@ object camion {
 		}
 	}
 	method verificarCamino(camino){
-		if(camino.puedeCircular(self)){
+		if(not camino.puedeCircular(self)){
 			self.error("El camino no es apto para el transporte")
 		}
 	}
@@ -115,7 +115,7 @@ object caminoVecinal {
 	var property pesoSoportado = 5000
 
 	method puedeCircular(transporte) {
-	  	return pesoSoportado<= transporte.pesoTotal()
+	  	return pesoSoportado >= transporte.pesoTotal()
 	}
 }
 

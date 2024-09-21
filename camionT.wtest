@@ -5,10 +5,12 @@ describe "Test trasporte" {
   test "No Puede transportar porque no tengo espacio en almacen y aparte por condiciones por ruta 9" {
     camion.cargar(bumblebee) //es robot --> nivelPeligrosidad = 30, peso = 800
     camion.cargar(knightRider) // --> nivelPeligrosidad = 10, peso = 500
+
     assert.equals(3, camion.totalBultos()) // 2 d bumblebee + 1 d knightRider
 
     assert.equals(2300, camion.pesoTotal())//peso total camion = 2300
     assert.notThat(camion.puedeCircularEnRuta(11))
+    
     almacen.cargar(arenaAGranel) //-> nivelPeligrosidad = 1, peso = 0, totalBultos = 1
     //assert.equals(1, almacen.totalBultos())
 
@@ -38,7 +40,37 @@ describe "Test trasporte" {
 
   }
 
+  test "No puede transportar por ruta9" {
+    camion.cargar(bumblebee) //es robot --> nivelPeligrosidad = 30, peso = 800
+    camion.cargar(knightRider) // --> nivelPeligrosidad = 10, peso = 500
+    assert.equals(3, camion.totalBultos()) // 2 d bumblebee + 1 d knightRider
+    almacen.bultosMax(50)
+
+    assert.equals(2300, camion.pesoTotal())//peso total camion = 2300
+
+  //  camion.transportar(almacen, ruta9 ) //--> NO, x la peligrosidad de bumblebee
+    assert.throwsExceptionWithMessage("El camino no es apto para el transporte",{camion.transportar(almacen, ruta9 )})
+
+    assert.equals(#{}, almacen.almacenaje())
+    assert.equals(#{bumblebee,knightRider}, camion.cosas())
+  
+  }
+  test "No puede transportar por caminoVecinal" {
+    camion.cargar(bumblebee) //es robot --> nivelPeligrosidad = 30, peso = 800
+    camion.cargar(knightRider) // --> nivelPeligrosidad = 10, peso = 500
+    assert.equals(3, camion.totalBultos()) // 2 d bumblebee + 1 d knightRider
+
+    caminoVecinal.pesoSoportado(2000)
+    assert.equals(2300, camion.pesoTotal())//peso total camion = 2300
+
+    assert.throwsExceptionWithMessage("El camino no es apto para el transporte",{camion.transportar(almacen, caminoVecinal)})
+
+    assert.equals(#{}, almacen.almacenaje())
+    assert.equals(#{bumblebee,knightRider}, camion.cosas())
+  
+  }
 }
+
 
 describe "Prueba de cosas" {
   test "bumblebee robot" {

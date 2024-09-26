@@ -1,6 +1,6 @@
 import cosas.*
 
-object camion {
+class Camion {
 
 	const property cosas = #{} 
 	const tara = 1000
